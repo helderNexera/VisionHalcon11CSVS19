@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using HalconDotNet;
 
 namespace VisionHalcon11CSVS19
 {
@@ -12,7 +11,33 @@ namespace VisionHalcon11CSVS19
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World !!!");
-            HOperatorSet.SetSystem("width", 512);
+
+            bool takeNewImage = true;
+            int i = 0;
+
+            Camera UEyeCam = new Camera();
+            Image ImageCam = new Image(ref UEyeCam);
+
+            UEyeCam.ConnectioCam();
+            if (UEyeCam.IsConnected)
+            {
+                Console.WriteLine("The Camera is connected!");
+            }
+            while (takeNewImage)
+            {
+                UEyeCam.TakePicture();
+                i++;
+                Console.WriteLine("Picture " + i + " Taked.");
+                Console.WriteLine("1 to continue");
+                Console.WriteLine("0 to quit");
+                takeNewImage = (Console.ReadLine() != "0");
+            }
+
+            UEyeCam.DeconnectionCam();
+            if (!UEyeCam.IsConnected)
+            {
+                Console.WriteLine("The Camera is disconnected!");
+            }
         }
     }
 }
