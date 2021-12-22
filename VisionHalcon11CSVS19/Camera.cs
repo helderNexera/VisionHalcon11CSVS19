@@ -21,11 +21,21 @@ namespace VisionHalcon11CSVS19
         {
             //HOperatorSet.GenEmptyObj(out Image);
             Image = null;
-            
+
+            HInfo.InfoFramegrabber(CameraComData, "device", out HDeviceName);
+            DeviceName = HDeviceName.ToString();
+
             if (!Framegrabber.IsInitialized())
             {
-                Framegrabber.OpenFramegrabber(CameraComData, 1, 1, 0, 0, 0, 0, "default", 8, "default", -1, "false", "default", "1", 0, -1);
+                Framegrabber.OpenFramegrabber(CameraComData, 1, 1, 0, 0, 0, 0, "default", -1, "default", -1, "false", "default", DeviceName, 0, -1);
             }
+            Framegrabber.SetFramegrabberParam("TriggerMode", "Off");
+            Framegrabber.SetFramegrabberParam("TriggerSource", "Freerun");
+            Framegrabber.SetFramegrabberParam("AcquisitionMode", "SingleFrame");
+            Framegrabber.SetFramegrabberParam("AcquisitionFrameRateAbs", 2.0);
+            Framegrabber.SetFramegrabberParam("ExposureTimeAbs", 8000.0);
+            Framegrabber.SetFramegrabberParam("Gain", 12.0);
+
             IsConnected = Framegrabber.IsInitialized();
             HOperatorSet.SetWindowAttr("background_color", "black");
             HOperatorSet.OpenWindow(0, 0, 800, 600, 0, "", "", out hv_WindowHandle);
@@ -65,6 +75,10 @@ namespace VisionHalcon11CSVS19
 
         private HTuple CameraWidth = 1600;
         private HTuple CameraHeight = 1200;
-        private String CameraComData = "uEye";
+        //private String CameraComData = "uEye";
+        private String CameraComData = "GigEVision";
+        //private String DeviceName = "000f315daec4_AlliedVisionTechnologies_MakoG503B";
+        private HTuple HDeviceName = "";
+        private String DeviceName = "";
     }
 }
