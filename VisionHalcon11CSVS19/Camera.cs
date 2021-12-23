@@ -18,14 +18,15 @@ namespace VisionHalcon11CSVS19
             HOperatorSet.SetSystem("height", CameraHeight);
         }
 
-        public bool InitHalcon(HWindowControl WindowsHalcon)
+        public bool InitHalcon(ref HWindowControl WindowsHalcon)
         {
             hv_WindowHandle = WindowsHalcon.HalconWindow;
             hv_WindowHandle.SetWindowParam("background_color", "black");
             hv_WindowHandle.SetDraw("margin");
             hv_WindowHandle.SetLineWidth(2);
-            set_display_font(hv_WindowHandle, 18, "mono", "false", "false");
+            //set_display_font(hv_WindowHandle, 18, "mono", "false", "false");
             HOperatorSet.SetSystem("border_shape_models", "false");
+            hv_WindowHandle.SetPart(0, 0, CameraHeight - 1, CameraWidth - 1);
             return true;
         }
 
@@ -77,10 +78,10 @@ namespace VisionHalcon11CSVS19
             Console.WriteLine("Grabing Image....");
             Image = Framegrabber.GrabImage();
             Console.WriteLine("Image Grabed.");
-            if (HDevWindowStack.IsOpen())
+            if (hv_WindowHandle.IsInitialized())
             {
-
-                HOperatorSet.DispObj(Image, HDevWindowStack.GetActive());
+                //hv_WindowHandle.DispObj(Image);
+                Image.DispObj(hv_WindowHandle);
             }
         }
 
@@ -99,8 +100,7 @@ namespace VisionHalcon11CSVS19
 
         // Chapter: Graphics / Text
         // Short Description: Set font independent of OS 
-        private void set_display_font(HTuple hv_WindowHandle, HTuple hv_Size, HTuple hv_Font,
-            HTuple hv_Bold, HTuple hv_Slant)
+        private void set_display_font(HTuple hv_WindowHandle, HTuple hv_Size, HTuple hv_Font, HTuple hv_Bold, HTuple hv_Slant)
         {
 
 

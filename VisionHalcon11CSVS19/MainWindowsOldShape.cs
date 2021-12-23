@@ -15,8 +15,9 @@ namespace VisionHalcon11CSVS19
         public MainWindowsOldShape()
         {
             InitializeComponent();
-            Camera Cam = new Camera();
-            Cam.InitHalcon(hwcVideo);
+            Cam.InitHalcon(ref hwcVideo);
+            Cam.ConnectionCam();
+            timer1.Enabled = true;
         }
 
         private void btnExit_Click(object sender, EventArgs e)
@@ -26,7 +27,7 @@ namespace VisionHalcon11CSVS19
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-
+            Cam.TakePicture();
         }
     }
 }
