@@ -3,13 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace VisionHalcon11CSVS19
 {
     class Program
     {
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
         static void Main(string[] args)
         {
+            /*Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new MainWindow());*/
+
+            /* ---------------- Console Version ---------------- */
+
             Console.WriteLine("Hello World !!!");
 
             bool takeNewImage = true;
@@ -18,7 +29,7 @@ namespace VisionHalcon11CSVS19
             Camera UEyeCam = new Camera();
             Image ImageCam = new Image(ref UEyeCam);
 
-            UEyeCam.ConnectioCam();
+            UEyeCam.ConnectionCam();
             if (UEyeCam.IsConnected)
             {
                 Console.WriteLine("The Camera is connected!");

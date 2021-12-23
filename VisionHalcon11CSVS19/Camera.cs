@@ -17,7 +17,7 @@ namespace VisionHalcon11CSVS19
             HOperatorSet.SetSystem("width", CameraWidth);
             HOperatorSet.SetSystem("height", CameraHeight);
         }
-        public void ConnectioCam()
+        public void ConnectionCam()
         {
             //HOperatorSet.GenEmptyObj(out Image);
             Image = null;
@@ -29,6 +29,7 @@ namespace VisionHalcon11CSVS19
             {
                 Framegrabber.OpenFramegrabber(CameraComData, 1, 1, 0, 0, 0, 0, "default", -1, "default", -1, "false", "default", DeviceName, 0, -1);
             }
+
             Framegrabber.SetFramegrabberParam("TriggerMode", "Off");
             Framegrabber.SetFramegrabberParam("TriggerSource", "Freerun");
             Framegrabber.SetFramegrabberParam("AcquisitionMode", "SingleFrame");
