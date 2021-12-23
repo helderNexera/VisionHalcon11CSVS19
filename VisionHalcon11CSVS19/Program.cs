@@ -15,40 +15,40 @@ namespace VisionHalcon11CSVS19
         [STAThread]
         static void Main(string[] args)
         {
-            /*Application.EnableVisualStyles();
+            Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainWindow());*/
+            Application.Run(new MainWindow());
 
             /* ---------------- Console Version ---------------- */
 
-            Console.WriteLine("Hello World !!!");
+            //Console.WriteLine("Hello World !!!");
 
-            bool takeNewImage = true;
-            int i = 0;
+            //bool takeNewImage = true;
+            //int i = 0;
 
-            Camera UEyeCam = new Camera();
-            Image ImageCam = new Image(ref UEyeCam);
+            //Camera UEyeCam = new Camera();
+            //Image ImageCam = new Image(ref UEyeCam);
 
-            UEyeCam.ConnectionCam();
-            if (UEyeCam.IsConnected)
-            {
-                Console.WriteLine("The Camera is connected!");
-            }
-            while (takeNewImage)
-            {
-                UEyeCam.TakePicture();
-                i++;
-                Console.WriteLine("Picture " + i + " Taked.");
-                Console.WriteLine("1 to continue");
-                Console.WriteLine("0 to quit");
-                takeNewImage = (Console.ReadLine() != "0");
-            }
+            //UEyeCam.ConnectionCam();
+            //if (UEyeCam.IsConnected)
+            //{
+            //    Console.WriteLine("The Camera is connected!");
+            //}
+            //while (takeNewImage)
+            //{
+            //    UEyeCam.TakePicture();
+            //    i++;
+            //    Console.WriteLine("Picture " + i + " Taked.");
+            //    Console.WriteLine("1 to continue");
+            //    Console.WriteLine("0 to quit");
+            //    takeNewImage = (Console.ReadLine() != "0");
+            //}
 
-            UEyeCam.DeconnectionCam();
-            if (!UEyeCam.IsConnected)
-            {
-                Console.WriteLine("The Camera is disconnected!");
-            }
+            //UEyeCam.DeconnectionCam();
+            //if (!UEyeCam.IsConnected)
+            //{
+            //    Console.WriteLine("The Camera is disconnected!");
+            //}
         }
     }
 }
