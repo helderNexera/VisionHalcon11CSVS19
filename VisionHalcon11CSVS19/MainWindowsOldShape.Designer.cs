@@ -93,7 +93,5 @@ namespace VisionHalcon11CSVS19
         private System.Windows.Forms.Button btnExit;
         private HalconDotNet.HWindowControl hwcVideo;
         private System.Windows.Forms.Timer timer1;
-
-        private Camera Cam = new Camera();
     }
 }

@@ -7,18 +7,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TwinCAT.Ads;
 
 namespace VisionHalcon11CSVS19
 {
     public partial class MainWindowsOldShape : Form
     {
-        public MainWindowsOldShape()
+        public MainWindowsOldShape(string[] args)
         {
             InitializeComponent();
+            TwincatInterface = new TTwincatinterface(args);
             Cam.InitHalcon(ref hwcVideo);
             Cam.ConnectionCam();
             timer1.Enabled = true;
         }
+
+        private Camera Cam = new Camera();
+        private TTwincatinterface TwincatInterface;
 
         private void btnExit_Click(object sender, EventArgs e)
         {
@@ -27,7 +32,14 @@ namespace VisionHalcon11CSVS19
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            Cam.TakePicture();
+            TwincatInterface.readTcAllVisionData();
+            UpdateUI();
+        }
+
+        private void UpdateUI()
+        {
+            TTwincatinterface.VISION_REQUEST Request;
+
         }
     }
 }

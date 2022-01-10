@@ -17,7 +17,7 @@ namespace VisionHalcon11CSVS19
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainWindowsOldShape());
+            Application.Run(new MainWindowsOldShape(args));
 
             /* ---------------- Console Version ---------------- */
 

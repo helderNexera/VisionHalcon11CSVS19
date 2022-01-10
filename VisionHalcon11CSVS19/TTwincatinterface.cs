@@ -1,0 +1,123 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using TwinCAT.Ads;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+
+namespace VisionHalcon11CSVS19
+{
+    using TC_BOOL       = System.Byte;
+    using TC_BYTE       = System.Byte;
+    using TC_INT        = System.Int16;
+    using TC_UINT       = System.UInt16;
+    using TC_DWORD      = System.UInt32;
+    using TC_REAL       = System.Single;
+    using TC_LREAL      = System.Double;
+    using TC_ALIGN_8B   = System.Byte;
+    using TC_ALIGN_16B  = System.Int16;
+    using TC_ALIGN_32B  = System.UInt32;
+    using TC_CHAR       = System.Char;
+
+    public class TTwincatinterface
+    {
+        public TTwincatinterface(string[] args)
+        {
+            address = ArgParser.Parse(args);
+            adsClient = new TcAdsClient();
+            try
+            {
+                AdsConnected = false;
+                AmsAddress address = ArgParser.Parse(args);
+                adsClient.Connect(address);
+
+                //create handles for the PLC variables;
+                hStructVisionVar = adsClient.CreateVariableHandle(VISION_VAR);
+                hStructVisionData = adsClient.CreateVariableHandle(VISION_VAR + ".TPartData");
+                hVisionRequest = adsClient.CreateVariableHandle(VISION_VAR + ".eRequest");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        Mutex TCVarAccess;
+
+        public void readTcAllVisionData()
+        {
+            this.TCVarAccess.WaitOne();
+            VisionData = (VISION_DATA)adsClient.ReadAny(hStructVisionVar, typeof(VISION_DATA));
+            this.TCVarAccess.ReleaseMutex();
+        }
+
+        private const string VISION_VAR = "MAIN.sMMI_VisionVar";
+        private TcAdsClient adsClient;
+        private AmsAddress address;
+        private VISION_DATA VisionData;
+
+        private bool AdsConnected;
+
+        //PLC variable handles
+        private int hStructVisionVar;
+        private int hStructVisionData;
+        private int hVisionRequest;
+
+        //Variable for visionHdl
+        public enum VISION_REQUEST : TC_INT
+        {
+            VR_None = 0,
+            VR_Init,
+            VR_Analyse
+        };
+
+        [StructLayout(LayoutKind.Sequential, Pack = 0)]
+        private class VISION_PART_DATA
+        {
+            private TC_LREAL VPD_X;
+            private TC_LREAL VPD_Y;
+            private TC_LREAL VPD_Theta;
+            private TC_LREAL VPD_Score;
+            [MarshalAs(UnmanagedType.I1)]
+            private TC_BOOL VPD_Valid;
+            [MarshalAs(UnmanagedType.I1)]
+            private TC_BOOL VPD_Present;
+        };
+
+        [StructLayout(LayoutKind.Sequential, Pack = 0)]
+        private class VISION_DATA
+        {
+            private VISION_REQUEST VI_Request;
+            [MarshalAs(UnmanagedType.I1)]
+            private TC_BOOL VI_RequestDone;
+            [MarshalAs(UnmanagedType.I1)]
+            private TC_BOOL VI_RequestError;
+            private TC_INT VI_MajorVersion;
+            private TC_INT VI_MinorVersion;
+            [MarshalAs(UnmanagedType.I1)]
+            private TC_BOOL VI_Alive;
+            [MarshalAs(UnmanagedType.I1)]
+            private TC_BOOL VI_Connected;
+            //specifies how .NET should marshal the string
+            //SizeConst specifies the number of characters the string has.
+            //'(inclusive the terminating null ).
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 21)]
+            private string VI_VisionRecipeName = "";
+            private VISION_PART_DATA VI_PartData;
+            [MarshalAs(UnmanagedType.I1)]
+            private TC_BOOL VI_Ready;
+            [MarshalAs(UnmanagedType.I1)]
+            TC_BOOL VI_SimRecipe;
+            TC_INT VI_UseModel;
+            TC_INT VI_MaxModel;
+            [MarshalAs(UnmanagedType.I1)]
+            TC_BOOL VI_MondemaMode;
+            [MarshalAs(UnmanagedType.I1)]
+            TC_BOOL VI_ConfigMode;
+        };
+
+    }
+}
