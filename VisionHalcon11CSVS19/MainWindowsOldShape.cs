@@ -17,7 +17,7 @@ namespace VisionHalcon11CSVS19
         {
             InitializeComponent();
             TwincatInterface = new TTwincatinterface(args);
-            Cam.InitHalcon(ref hwcVideo);
+            Cam.InitHalcon(ref hwcVideo, ref TwincatInterface);
             Cam.ConnectionCam();
             timer1.Enabled = true;
         }

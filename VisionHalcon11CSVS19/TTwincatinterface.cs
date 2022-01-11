@@ -71,6 +71,13 @@ namespace VisionHalcon11CSVS19
             VisionData.VI_RequestError = Convert.ToByte(false);
             this.TCVarAccess.ReleaseMutex();
         }
+        public void ClearRequest()
+        {
+            this.TCVarAccess.WaitOne();
+            adsClient.WriteAny(hVisionRequest, (short)VISION_REQUEST.VR_None);
+            VisionData.VI_Request = VISION_REQUEST.VR_None;
+            this.TCVarAccess.ReleaseMutex();
+        }
 
         private const string VISION_VAR = "MAIN.sMMI_VisionVar";
 

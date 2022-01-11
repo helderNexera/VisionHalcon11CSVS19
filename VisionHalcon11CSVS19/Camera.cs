@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HalconDotNet;
 using System.Windows.Forms;
+using System.IO;
 
 namespace VisionHalcon11CSVS19
 {
@@ -19,7 +20,7 @@ namespace VisionHalcon11CSVS19
             HOperatorSet.SetSystem("height", CameraHeight);
         }
 
-        public bool InitHalcon(ref HWindowControl WindowsHalcon)
+        public bool InitHalcon(ref HWindowControl WindowsHalcon, ref TTwincatinterface twincatinterface)
         {
             hv_WindowHandle = WindowsHalcon.HalconWindow;
             hv_WindowHandle.SetWindowParam("background_color", "black");
@@ -28,6 +29,7 @@ namespace VisionHalcon11CSVS19
             //set_display_font(hv_WindowHandle, 18, "mono", "false", "false");
             HOperatorSet.SetSystem("border_shape_models", "false");
             hv_WindowHandle.SetPart(0, 0, CameraHeight - 1, CameraWidth - 1);
+            Twincatinterface = twincatinterface;
             return true;
         }
 
@@ -82,12 +84,24 @@ namespace VisionHalcon11CSVS19
                     ShapeModel.Dispose();
                 }
                 ModelLoaded = false;
-                LoadModel(RefName);
-                TParams.GetPartParams(RefName);
+
+                if (File.Exists("c:/vision/reference/" + RefName + ".shm"))
+                {
+                    LoadModel(RefName);
+                    TParams.GetPartParams(RefName);
+                }
+                else
+                {
+                    Twincatinterface.ClearRequest();
+                    MessageBox.Show("Le fichier " + RefName + " n'existe pas.");
+                    return false;
+                }
             }
             catch (Exception ex)
             {
+                Twincatinterface.ClearRequest();
                 MessageBox.Show(ex.Message);
+                return false;
             }
             return true;
         }
@@ -118,11 +132,14 @@ namespace VisionHalcon11CSVS19
         private HTuple HDeviceName = "";
         private String DeviceName = "";
 
+        private TTwincatinterface Twincatinterface;
+
         public bool ModelLoaded { get; private set; }
 
         private void LoadModel(string RefFileName)
         {
-            ShapeModel.ReadShapeModel("C:/vision/referencence/" + RefFileName + ".shm");
+            //ShapeModel.ReadShapeModel("C:/vision/referencence/" + RefFileName + ".shm");
+            ShapeModel = new HShapeModel("C:/vision/reference/" + RefFileName + ".shm");
             ModelLoaded = true;
         }
 
