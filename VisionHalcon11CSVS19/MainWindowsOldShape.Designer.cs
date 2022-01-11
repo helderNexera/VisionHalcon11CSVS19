@@ -31,6 +31,8 @@ namespace VisionHalcon11CSVS19
         {
             this.components = new System.ComponentModel.Container();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.lbFileRefName = new System.Windows.Forms.Label();
+            this.lbFileRef = new System.Windows.Forms.Label();
             this.btnExit = new System.Windows.Forms.Button();
             this.hwcVideo = new HalconDotNet.HWindowControl();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
@@ -39,11 +41,31 @@ namespace VisionHalcon11CSVS19
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.lbFileRefName);
+            this.panel1.Controls.Add(this.lbFileRef);
             this.panel1.Controls.Add(this.btnExit);
             this.panel1.Location = new System.Drawing.Point(12, 12);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(800, 180);
             this.panel1.TabIndex = 1;
+            // 
+            // lbFileRefName
+            // 
+            this.lbFileRefName.AutoSize = true;
+            this.lbFileRefName.Location = new System.Drawing.Point(57, 157);
+            this.lbFileRefName.Name = "lbFileRefName";
+            this.lbFileRefName.Size = new System.Drawing.Size(53, 13);
+            this.lbFileRefName.TabIndex = 2;
+            this.lbFileRefName.Text = "Ref name";
+            // 
+            // lbFileRef
+            // 
+            this.lbFileRef.AutoSize = true;
+            this.lbFileRef.Location = new System.Drawing.Point(3, 157);
+            this.lbFileRef.Name = "lbFileRef";
+            this.lbFileRef.Size = new System.Drawing.Size(49, 13);
+            this.lbFileRef.TabIndex = 1;
+            this.lbFileRef.Text = "File Ref :";
             // 
             // btnExit
             // 
@@ -84,6 +106,7 @@ namespace VisionHalcon11CSVS19
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Nexera - NexVision Software";
             this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -93,5 +116,7 @@ namespace VisionHalcon11CSVS19
         private System.Windows.Forms.Button btnExit;
         private HalconDotNet.HWindowControl hwcVideo;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Label lbFileRefName;
+        private System.Windows.Forms.Label lbFileRef;
     }
 }

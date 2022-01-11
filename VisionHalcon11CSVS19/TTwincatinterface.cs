@@ -30,6 +30,7 @@ namespace VisionHalcon11CSVS19
             adsClient = new TcAdsClient();
             try
             {
+                TCVarAccess = new Mutex();
                 AdsConnected = false;
                 AmsAddress address = ArgParser.Parse(args);
                 adsClient.Connect(address);
@@ -38,14 +39,13 @@ namespace VisionHalcon11CSVS19
                 hStructVisionVar = adsClient.CreateVariableHandle(VISION_VAR);
                 hStructVisionData = adsClient.CreateVariableHandle(VISION_VAR + ".TPartData");
                 hVisionRequest = adsClient.CreateVariableHandle(VISION_VAR + ".eRequest");
+                hVisionRequestError = adsClient.CreateVariableHandle(VISION_VAR + ".bRequestError");
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
         }
-
-        Mutex TCVarAccess;
 
         public void readTcAllVisionData()
         {
@@ -54,7 +54,27 @@ namespace VisionHalcon11CSVS19
             this.TCVarAccess.ReleaseMutex();
         }
 
+        public VISION_REQUEST getVisionRequest()
+        {
+            return VisionData.VI_Request;
+        }
+
+        public string getRefFileName()
+        {
+            return VisionData.VI_VisionRecipeName;
+        }
+
+        public void ClearRequestError()
+        {
+            this.TCVarAccess.WaitOne();
+            adsClient.WriteAny(hVisionRequestError, false);
+            VisionData.VI_RequestError = Convert.ToByte(false);
+            this.TCVarAccess.ReleaseMutex();
+        }
+
         private const string VISION_VAR = "MAIN.sMMI_VisionVar";
+
+        private Mutex TCVarAccess;
         private TcAdsClient adsClient;
         private AmsAddress address;
         private VISION_DATA VisionData;
@@ -65,12 +85,14 @@ namespace VisionHalcon11CSVS19
         private int hStructVisionVar;
         private int hStructVisionData;
         private int hVisionRequest;
+        private int hVisionRequestError;
 
         //Variable for visionHdl
         public enum VISION_REQUEST : TC_INT
         {
             VR_None = 0,
             VR_Init,
+            VR_GrabImage,
             VR_Analyse
         };
 
@@ -90,11 +112,11 @@ namespace VisionHalcon11CSVS19
         [StructLayout(LayoutKind.Sequential, Pack = 0)]
         private class VISION_DATA
         {
-            private VISION_REQUEST VI_Request;
+            public VISION_REQUEST VI_Request;
             [MarshalAs(UnmanagedType.I1)]
             private TC_BOOL VI_RequestDone;
             [MarshalAs(UnmanagedType.I1)]
-            private TC_BOOL VI_RequestError;
+            public TC_BOOL VI_RequestError;
             private TC_INT VI_MajorVersion;
             private TC_INT VI_MinorVersion;
             [MarshalAs(UnmanagedType.I1)]
@@ -105,7 +127,7 @@ namespace VisionHalcon11CSVS19
             //SizeConst specifies the number of characters the string has.
             //'(inclusive the terminating null ).
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 21)]
-            private string VI_VisionRecipeName = "";
+            public string VI_VisionRecipeName = "";
             private VISION_PART_DATA VI_PartData;
             [MarshalAs(UnmanagedType.I1)]
             private TC_BOOL VI_Ready;

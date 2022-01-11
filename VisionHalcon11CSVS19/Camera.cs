@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HalconDotNet;
+using System.Windows.Forms;
 
 namespace VisionHalcon11CSVS19
 {
@@ -72,6 +73,25 @@ namespace VisionHalcon11CSVS19
             IsConnected = Framegrabber.IsInitialized();
         }
 
+        public bool InitVision(string RefName)
+        {
+            try
+            {
+                if (ModelLoaded)
+                {
+                    ShapeModel.Dispose();
+                }
+                ModelLoaded = false;
+                LoadModel(RefName);
+                TParams.GetPartParams(RefName);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            return true;
+        }
+
         public void TakePicture()
         {
             Image = null;
@@ -88,6 +108,7 @@ namespace VisionHalcon11CSVS19
         private HFramegrabber Framegrabber;
         private HImage Image = null;
         private HWindow hv_WindowHandle = null;
+        private HShapeModel ShapeModel = null;
 
         private HTuple CameraWidth = 2592;
         private HTuple CameraHeight = 1944;
@@ -97,6 +118,13 @@ namespace VisionHalcon11CSVS19
         private HTuple HDeviceName = "";
         private String DeviceName = "";
 
+        public bool ModelLoaded { get; private set; }
+
+        private void LoadModel(string RefFileName)
+        {
+            ShapeModel.ReadShapeModel("C:/vision/referencence/" + RefFileName + ".shm");
+            ModelLoaded = true;
+        }
 
         // Chapter: Graphics / Text
         // Short Description: Set font independent of OS 

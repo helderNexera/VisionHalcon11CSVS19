@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -13,11 +14,20 @@ namespace VisionHalcon11CSVS19
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
+            Mutex mutex = new Mutex(true, "{DDE97D2C-179F-4A95-B132-B4D3AE3B060D}");
+
+            if (!mutex.WaitOne(TimeSpan.Zero, true))
+            {
+                return -1;
+            }
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainWindowsOldShape(args));
+
+            return 0;
 
             /* ---------------- Console Version ---------------- */
 
