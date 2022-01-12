@@ -36,6 +36,7 @@ namespace VisionHalcon11CSVS19
             this.btnExit = new System.Windows.Forms.Button();
             this.hwcVideo = new HalconDotNet.HWindowControl();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.btnInit = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -43,6 +44,7 @@ namespace VisionHalcon11CSVS19
             // 
             this.panel1.Controls.Add(this.lbFileRefName);
             this.panel1.Controls.Add(this.lbFileRef);
+            this.panel1.Controls.Add(this.btnInit);
             this.panel1.Controls.Add(this.btnExit);
             this.panel1.Location = new System.Drawing.Point(12, 12);
             this.panel1.Name = "panel1";
@@ -93,6 +95,17 @@ namespace VisionHalcon11CSVS19
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // btnInit
+            // 
+            this.btnInit.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnInit.Location = new System.Drawing.Point(542, 12);
+            this.btnInit.Name = "btnInit";
+            this.btnInit.Size = new System.Drawing.Size(120, 60);
+            this.btnInit.TabIndex = 0;
+            this.btnInit.Text = "Init";
+            this.btnInit.UseVisualStyleBackColor = true;
+            this.btnInit.Click += new System.EventHandler(this.btnInit_Click);
+            // 
             // MainWindowsOldShape
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -118,5 +131,6 @@ namespace VisionHalcon11CSVS19
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label lbFileRefName;
         private System.Windows.Forms.Label lbFileRef;
+        private System.Windows.Forms.Button btnInit;
     }
 }

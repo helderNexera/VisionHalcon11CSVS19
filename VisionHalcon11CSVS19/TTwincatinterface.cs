@@ -43,11 +43,18 @@ namespace VisionHalcon11CSVS19
                 hVisionReady = adsClient.CreateVariableHandle(VISION_VAR + ".bReady");
                 hVisionAlive = adsClient.CreateVariableHandle(VISION_VAR + ".bAlive");
                 hVisionConnected = adsClient.CreateVariableHandle(VISION_VAR + ".bConnected");
+                AdsConnected = true;
             }
             catch (Exception ex)
             {
+                AdsConnected = false;
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        public bool IsConnected()
+        {
+            return AdsConnected;
         }
 
         public void readTcAllVisionData()

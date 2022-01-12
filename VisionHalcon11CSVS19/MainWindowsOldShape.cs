@@ -34,8 +34,17 @@ namespace VisionHalcon11CSVS19
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            TwincatInterface.readTcAllVisionData();
-            UpdateUI();
+            if (TwincatInterface.IsConnected())
+            {
+                TwincatInterface.readTcAllVisionData();
+                UpdateUI();
+            }
+            else
+            {
+                timer1.Enabled = false;
+                MessageBox.Show("Erreur ADS pas de connection à l'automation. \nFermer application.");
+                Application.Exit();
+            }
         }
 
         private void UpdateUI()
@@ -105,6 +114,13 @@ namespace VisionHalcon11CSVS19
             TwincatInterface.SetConnectedData(true);
 
             TwincatInterface.ClearRequest();
+        }
+
+        private void btnInit_Click(object sender, EventArgs e)
+        {
+            string RefName = TwincatInterface.getRefFileName();
+            Cam.InitVision(RefName);
+            lbFileRefName.Text = RefName;
         }
     }
 }
