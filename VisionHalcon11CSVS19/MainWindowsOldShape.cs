@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TwinCAT.Ads;
@@ -17,13 +18,14 @@ namespace VisionHalcon11CSVS19
         {
             InitializeComponent();
             TwincatInterface = new TTwincatinterface(args);
-            Cam.InitHalcon(ref hwcVideo, ref TwincatInterface);
+            Cam.InitHalcon(ref hwcVideo);
             Cam.ConnectionCam();
             timer1.Enabled = true;
         }
 
         private Camera Cam = new Camera();
         private TTwincatinterface TwincatInterface;
+        private static bool Alive = false;
 
         private void btnExit_Click(object sender, EventArgs e)
         {
@@ -62,16 +64,39 @@ namespace VisionHalcon11CSVS19
                     {
                         TwincatInterface.SetRequestError(true);
                         TwincatInterface.SetReadyData(false);
+                        TwincatInterface.ClearRequest();
+                        MessageBox.Show("Le fichier " + RefFileName + " n'existe pas!");
                     }
                     break;
                 case TTwincatinterface.VISION_REQUEST.VR_GrabImage:
-
+                    // Try take a picture
+                    if (Cam.TakePicture())
+                    {
+                        TwincatInterface.SetRequestError(false);
+                        Cam.DisplayImage();
+                    }
+                    else
+                    {
+                        TwincatInterface.SetRequestError(true);
+                    }
                     break;
                 case TTwincatinterface.VISION_REQUEST.VR_Analyse:
+                    // Image must be analysed
+
                     break;
                 default:
                     break;
             }
+            if (Alive)
+            {
+                TwincatInterface.SetAliveData(true);
+            }
+            else
+            {
+                TwincatInterface.SetAliveData(false);
+            }
+            Alive = !Alive;
+            TwincatInterface.SetConnectedData(true);
 
             TwincatInterface.ClearRequest();
         }

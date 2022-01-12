@@ -22,7 +22,7 @@ namespace VisionHalcon11CSVS19
             HOperatorSet.SetSystem("height", CameraHeight);
         }
 
-        public bool InitHalcon(ref HWindowControl WindowsHalcon, ref TTwincatinterface twincatinterface)
+        public bool InitHalcon(ref HWindowControl WindowsHalcon)
         {
             hv_WindowHandle = WindowsHalcon.HalconWindow;
             hv_WindowHandle.SetWindowParam("background_color", "black");
@@ -94,7 +94,6 @@ namespace VisionHalcon11CSVS19
                 }
                 else
                 {
-                    MessageBox.Show("Le fichier " + RefName + " n'existe pas.");
                     return false;
                 }
             }
@@ -106,14 +105,25 @@ namespace VisionHalcon11CSVS19
             return true;
         }
 
-        public void TakePicture()
+        public bool TakePicture()
         {
             Image = null;
-            if (IsConnected)
+            try
             {
                 Image = Framegrabber.GrabImage();
+                return true;
             }
-            if (hv_WindowHandle.IsInitialized())
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return false;
+            }
+        }
+
+        public void DisplayImage()
+        {
+
+            if (hv_WindowHandle.IsInitialized() && IsConnected)
             {
                 //hv_WindowHandle.DispObj(Image);
                 Image.DispObj(hv_WindowHandle);

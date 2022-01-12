@@ -41,6 +41,8 @@ namespace VisionHalcon11CSVS19
                 hVisionRequest = adsClient.CreateVariableHandle(VISION_VAR + ".eRequest");
                 hVisionRequestError = adsClient.CreateVariableHandle(VISION_VAR + ".bRequestError");
                 hVisionReady = adsClient.CreateVariableHandle(VISION_VAR + ".bReady");
+                hVisionAlive = adsClient.CreateVariableHandle(VISION_VAR + ".bAlive");
+                hVisionConnected = adsClient.CreateVariableHandle(VISION_VAR + ".bConnected");
             }
             catch (Exception ex)
             {
@@ -88,6 +90,20 @@ namespace VisionHalcon11CSVS19
             this.TCVarAccess.ReleaseMutex();
         }
 
+        public void SetAliveData(bool Value)
+        {
+            this.TCVarAccess.WaitOne();
+            adsClient.WriteAny(hVisionAlive, Value);
+            this.TCVarAccess.ReleaseMutex();
+        }
+
+        public void SetConnectedData(bool Value)
+        {
+            this.TCVarAccess.WaitOne();
+            adsClient.WriteAny(hVisionConnected, Value);
+            this.TCVarAccess.ReleaseMutex();
+        }
+
         private const string VISION_VAR = "MAIN.sMMI_VisionVar";
 
         private Mutex TCVarAccess;
@@ -103,14 +119,16 @@ namespace VisionHalcon11CSVS19
         private int hVisionRequest;
         private int hVisionRequestError;
         private int hVisionReady;
+        private int hVisionAlive;
+        private int hVisionConnected;
 
         //Variable for visionHdl
         public enum VISION_REQUEST : TC_INT
         {
             VR_None = 0,
             VR_Init,
-            VR_GrabImage,
-            VR_Analyse
+            VR_Analyse,
+            VR_GrabImage
         };
 
         [StructLayout(LayoutKind.Sequential, Pack = 0)]
