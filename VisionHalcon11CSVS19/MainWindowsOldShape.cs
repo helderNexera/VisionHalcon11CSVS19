@@ -40,27 +40,40 @@ namespace VisionHalcon11CSVS19
         {
             TTwincatinterface.VISION_REQUEST Request = 0;
             String RefFileName = "";
-            String FileName = "";
+            //String FileName = "";
 
             Request = TwincatInterface.getVisionRequest();
             switch (Request)
             {
                 case TTwincatinterface.VISION_REQUEST.VR_None:
+                    // No command
                     break;
                 case TTwincatinterface.VISION_REQUEST.VR_Init:
+                    // Initialisation for file reference
                     RefFileName = TwincatInterface.getRefFileName();
-                    FileName = "c:\\vision\\reference\\" + "shm";
-                    Cam.InitVision(RefFileName);
-                    lbFileRefName.Text = RefFileName;
-                    TwincatInterface.ClearRequestError();
+                    //FileName = "c:\\vision\\reference\\" + "shm";
+                    if (Cam.InitVision(RefFileName))
+                    {
+                        lbFileRefName.Text = RefFileName;
+                        TwincatInterface.SetRequestError(false);
+                        TwincatInterface.SetReadyData(true);
+                    }
+                    else
+                    {
+                        TwincatInterface.SetRequestError(true);
+                        TwincatInterface.SetReadyData(false);
+                    }
                     break;
                 case TTwincatinterface.VISION_REQUEST.VR_GrabImage:
+
                     break;
                 case TTwincatinterface.VISION_REQUEST.VR_Analyse:
                     break;
                 default:
                     break;
             }
+
+            TwincatInterface.ClearRequest();
         }
     }
 }

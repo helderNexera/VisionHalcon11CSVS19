@@ -40,6 +40,7 @@ namespace VisionHalcon11CSVS19
                 hStructVisionData = adsClient.CreateVariableHandle(VISION_VAR + ".TPartData");
                 hVisionRequest = adsClient.CreateVariableHandle(VISION_VAR + ".eRequest");
                 hVisionRequestError = adsClient.CreateVariableHandle(VISION_VAR + ".bRequestError");
+                hVisionReady = adsClient.CreateVariableHandle(VISION_VAR + ".bReady");
             }
             catch (Exception ex)
             {
@@ -64,18 +65,26 @@ namespace VisionHalcon11CSVS19
             return VisionData.VI_VisionRecipeName;
         }
 
-        public void ClearRequestError()
+        public void SetRequestError(bool Value)
         {
             this.TCVarAccess.WaitOne();
-            adsClient.WriteAny(hVisionRequestError, false);
-            VisionData.VI_RequestError = Convert.ToByte(false);
+            adsClient.WriteAny(hVisionRequestError, Value);
+            VisionData.VI_RequestError = Convert.ToByte(Value);
             this.TCVarAccess.ReleaseMutex();
         }
+
         public void ClearRequest()
         {
             this.TCVarAccess.WaitOne();
             adsClient.WriteAny(hVisionRequest, (short)VISION_REQUEST.VR_None);
             VisionData.VI_Request = VISION_REQUEST.VR_None;
+            this.TCVarAccess.ReleaseMutex();
+        }
+
+        public void SetReadyData(bool Value)
+        {
+            this.TCVarAccess.WaitOne();
+            adsClient.WriteAny(hVisionReady, Value);
             this.TCVarAccess.ReleaseMutex();
         }
 
@@ -93,6 +102,7 @@ namespace VisionHalcon11CSVS19
         private int hStructVisionData;
         private int hVisionRequest;
         private int hVisionRequestError;
+        private int hVisionReady;
 
         //Variable for visionHdl
         public enum VISION_REQUEST : TC_INT
@@ -147,6 +157,5 @@ namespace VisionHalcon11CSVS19
             [MarshalAs(UnmanagedType.I1)]
             TC_BOOL VI_ConfigMode;
         };
-
     }
 }

@@ -12,6 +12,8 @@ namespace VisionHalcon11CSVS19
     public class Camera
     {
         public bool IsConnected { get; private set; }
+        public bool ModelLoaded { get; private set; }
+
         public Camera()
         {
             Framegrabber = new HFramegrabber();
@@ -29,7 +31,6 @@ namespace VisionHalcon11CSVS19
             //set_display_font(hv_WindowHandle, 18, "mono", "false", "false");
             HOperatorSet.SetSystem("border_shape_models", "false");
             hv_WindowHandle.SetPart(0, 0, CameraHeight - 1, CameraWidth - 1);
-            Twincatinterface = twincatinterface;
             return true;
         }
 
@@ -89,17 +90,16 @@ namespace VisionHalcon11CSVS19
                 {
                     LoadModel(RefName);
                     TParams.GetPartParams(RefName);
+                    ModelLoaded = true;
                 }
                 else
                 {
-                    Twincatinterface.ClearRequest();
                     MessageBox.Show("Le fichier " + RefName + " n'existe pas.");
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                Twincatinterface.ClearRequest();
                 MessageBox.Show(ex.Message);
                 return false;
             }
@@ -109,9 +109,10 @@ namespace VisionHalcon11CSVS19
         public void TakePicture()
         {
             Image = null;
-            Console.WriteLine("Grabing Image....");
-            Image = Framegrabber.GrabImage();
-            Console.WriteLine("Image Grabed.");
+            if (IsConnected)
+            {
+                Image = Framegrabber.GrabImage();
+            }
             if (hv_WindowHandle.IsInitialized())
             {
                 //hv_WindowHandle.DispObj(Image);
@@ -131,10 +132,6 @@ namespace VisionHalcon11CSVS19
         //private String DeviceName = "000f315daec4_AlliedVisionTechnologies_MakoG503B";
         private HTuple HDeviceName = "";
         private String DeviceName = "";
-
-        private TTwincatinterface Twincatinterface;
-
-        public bool ModelLoaded { get; private set; }
 
         private void LoadModel(string RefFileName)
         {
