@@ -91,9 +91,11 @@ namespace VisionHalcon11CSVS19
                     LoadModel(RefName);
                     TParams.GetPartParams(RefName);
                     ModelLoaded = true;
+                    hv_WindowHandle.ClearWindow();
                 }
                 else
                 {
+                    disp_message(hv_WindowHandle, "Le fichier " + RefName + " n'existe pas", "window", 40, 10, "red", "false");
                     return false;
                 }
             }
@@ -137,6 +139,8 @@ namespace VisionHalcon11CSVS19
             HTuple SinAngle, CosAngle;
             HTuple RefSearchRadius;
             HTuple ModelRadius, ModelThr;
+
+            HObject Circle, ImageReduced, SelectedRegions, RegionUnion, Region1, ConnectedRegion;
 
             bool PartFound = false;
 
@@ -188,8 +192,29 @@ namespace VisionHalcon11CSVS19
                 if (!PartFound)
                 {
                     Data.VPD_Valid = Convert.ToByte(false);
-
+                    // no good part found, check if a part is present
+                    HOperatorSet.GenCircle(out Circle, CameraHeight / 2, CameraWidth / 2, RefSearchRadius);
+                    HOperatorSet.ReduceDomain(Image, Circle, out ImageReduced);
+                    HOperatorSet.Threshold(ImageReduced, out Region1, ModelThr, 255);
+                    HOperatorSet.Connection(Region1, out ConnectedRegion);
+                    HOperatorSet.SelectShape(ConnectedRegion, out SelectedRegions, "area", "and", 50000, 1000000);
+                    //HOperatorSet.SelectShape(Image, out SelectedRegions, "area", "and", 50000, 500000);
+                    HOperatorSet.Union1(SelectedRegions, out RegionUnion);
+                    if (RegionUnion.CountObj() > 0)
+                    {
+                        Data.VPD_Present = Convert.ToByte(true);
+                        disp_message(hv_WindowHandle, "Bad part found", "window", 40, 10, "red", "false");
+                    }
+                    else
+                    {
+                        // no part
+                        disp_message(hv_WindowHandle, "No part found", "window", 40, 10, "white", "false");
+                    }
                 }
+            }
+            else
+            {
+                disp_message(hv_WindowHandle, "Model not loaded or Image not taked", "window", 40, 10, "white", "false");
             }
         }
 
