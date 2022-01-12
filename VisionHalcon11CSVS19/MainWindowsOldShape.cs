@@ -41,6 +41,7 @@ namespace VisionHalcon11CSVS19
         private void UpdateUI()
         {
             TTwincatinterface.VISION_REQUEST Request = 0;
+            TTwincatinterface.VISION_PART_DATA Data = new TTwincatinterface.VISION_PART_DATA();
             String RefFileName = "";
             //String FileName = "";
 
@@ -82,11 +83,15 @@ namespace VisionHalcon11CSVS19
                     break;
                 case TTwincatinterface.VISION_REQUEST.VR_Analyse:
                     // Image must be analysed
-
+                    
+                    Cam.DoAnalysis(ref Data);
+                    TwincatInterface.ClearRequest();
+                    //TwincatInterface.WriteVisionData();
                     break;
                 default:
                     break;
             }
+
             if (Alive)
             {
                 TwincatInterface.SetAliveData(true);
@@ -96,6 +101,7 @@ namespace VisionHalcon11CSVS19
                 TwincatInterface.SetAliveData(false);
             }
             Alive = !Alive;
+
             TwincatInterface.SetConnectedData(true);
 
             TwincatInterface.ClearRequest();

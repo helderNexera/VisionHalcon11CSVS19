@@ -132,16 +132,16 @@ namespace VisionHalcon11CSVS19
         };
 
         [StructLayout(LayoutKind.Sequential, Pack = 0)]
-        private class VISION_PART_DATA
+        public class VISION_PART_DATA
         {
-            private TC_LREAL VPD_X;
-            private TC_LREAL VPD_Y;
-            private TC_LREAL VPD_Theta;
-            private TC_LREAL VPD_Score;
+            public TC_LREAL VPD_X;
+            public TC_LREAL VPD_Y;
+            public TC_LREAL VPD_Theta;
+            public TC_LREAL VPD_Score;
             [MarshalAs(UnmanagedType.I1)]
-            private TC_BOOL VPD_Valid;
+            public TC_BOOL VPD_Valid;
             [MarshalAs(UnmanagedType.I1)]
-            private TC_BOOL VPD_Present;
+            public TC_BOOL VPD_Present;
         };
 
         [StructLayout(LayoutKind.Sequential, Pack = 0)]

@@ -15,7 +15,7 @@ namespace VisionHalcon11CSVS19
         static double ModelThr;
         public static void GetPartParams(string RefFileName)
         {
-            String FileName = "C:/vision/referencence/" + RefFileName + ".xml";
+            String FileName = "C:/vision/reference/" + RefFileName + ".xml";
             if (!File.Exists(FileName))
             {
                 RefSearchRadius = 0;
@@ -85,6 +85,22 @@ namespace VisionHalcon11CSVS19
                     }
                 }
             }
+        }
+
+        public static double GetSearchRadius()
+        {
+            return RefSearchRadius;
+        }
+
+        public static double GetModelRadius()
+        {
+            return ModelRadius;
+        }
+
+
+        public static double GetModelThreshold()
+        {
+            return ModelThr;
         }
     }
 }

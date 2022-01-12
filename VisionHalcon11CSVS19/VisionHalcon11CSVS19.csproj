@@ -105,6 +105,7 @@
   <ItemGroup>
     <Compile Include="ArgParser.cs" />
     <Compile Include="Camera.cs" />
+    <Compile Include="disp_message.cs" />
     <Compile Include="Image.cs" />
     <Compile Include="ConsoleUI.cs" />
     <Compile Include="MainWindowsOldShape.cs">
