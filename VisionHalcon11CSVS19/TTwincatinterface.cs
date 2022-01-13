@@ -26,7 +26,6 @@ namespace VisionHalcon11CSVS19
     {
         public TTwincatinterface(string[] args)
         {
-            address = ArgParser.Parse(args);
             adsClient = new TcAdsClient();
             try
             {
@@ -122,10 +121,9 @@ namespace VisionHalcon11CSVS19
 
         private readonly Mutex TCVarAccess;
         private readonly TcAdsClient adsClient;
-        private readonly AmsAddress address;
         private VISION_DATA VisionData;
 
-        private bool AdsConnected;
+        private readonly bool AdsConnected;
 
         //PLC variable handles
         private int hStructVisionVar;

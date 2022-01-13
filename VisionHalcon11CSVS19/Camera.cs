@@ -113,7 +113,7 @@ namespace VisionHalcon11CSVS19
             Image = null;
             try
             {
-                //Thread.Sleep(2000);
+                Thread.Sleep(2000);
                 Image = Framegrabber.GrabImage();
                 return true;
             }
@@ -134,13 +134,9 @@ namespace VisionHalcon11CSVS19
 
         public void DoAnalysis(ref TTwincatinterface.VISION_PART_DATA Data, bool DispayInWindow)
         {
-            //HTuple Row, Column, Angle, Score;
             HTuple DeltaX, DeltaY;
-            //HTuple SinAngle, CosAngle;
             HTuple RefSearchRadius;
             HTuple ModelRadius, ModelThr;
-
-            //HObject Circle, ImageReduced, SelectedRegions, RegionUnion, Region1, ConnectedRegion;
 
             bool PartFound = false;
 
@@ -185,8 +181,6 @@ namespace VisionHalcon11CSVS19
                             disp_message(hv_WindowHandle, ("Score : " + ((Score * 100).TupleString(".0f"))) + " %", "window", 30, 5, "green", "false");
                         }
 
-
-
                         Data.VPD_Present = Convert.ToByte(true);
                         Data.VPD_X = DeltaX;
                         Data.VPD_Y = DeltaY;
@@ -197,14 +191,16 @@ namespace VisionHalcon11CSVS19
                 }
                 if (!PartFound)
                 {
-                    Data.VPD_Valid = Convert.ToByte(false);
                     // no good part found, check if a part is present
+                    Data.VPD_Valid = Convert.ToByte(false);
+
                     HOperatorSet.GenCircle(out HObject Circle, CameraHeight / 2, CameraWidth / 2, RefSearchRadius);
                     HOperatorSet.ReduceDomain(Image, Circle, out HObject ImageReduced);
                     HOperatorSet.Threshold(ImageReduced, out HObject Region1, ModelThr, 255);
                     HOperatorSet.Connection(Region1, out HObject ConnectedRegion);
                     HOperatorSet.SelectShape(ConnectedRegion, out HObject SelectedRegions, "area", "and", 20000, 1000000);
                     HOperatorSet.Union1(SelectedRegions, out HObject RegionUnion);
+
                     if (RegionUnion.CountObj() > 0)
                     {
                         // No good part found, check if a part is present
@@ -236,7 +232,6 @@ namespace VisionHalcon11CSVS19
             Image = null;
             try
             {
-                //Image = Framegrabber.GrabImage();
                 TakePicture();
             }
             catch (Exception ex)
@@ -268,20 +263,19 @@ namespace VisionHalcon11CSVS19
             return true;
         }
 
-        private HFramegrabber Framegrabber;
+        private readonly HFramegrabber Framegrabber;
         private HImage Image = null;
         private HWindow hv_WindowHandle = null;
         private HShapeModel ShapeModel = null;
 
-        private HTuple CameraWidth = 2592;
-        private HTuple CameraHeight = 1944;
-        //private const HTuple PixToMm = ;
+        private readonly HTuple CameraWidth = 2592;
+        private readonly HTuple CameraHeight = 1944;
+        private readonly String CameraComData = "GigEVision";
         //private String CameraComData = "uEye";
-        private String CameraComData = "GigEVision";
         //private String DeviceName = "000f315daec4_AlliedVisionTechnologies_MakoG503B";
         private HTuple HDeviceName = "";
         private String DeviceName = "";
-        private double PixToMm = 0.022903;              // ((EtalonReel / EtalonImage) * WindowSize) / WindowSizePixel
+        private readonly double PixToMm = 0.022903;              // ((EtalonReel / EtalonImage) * WindowSize) / WindowSizePixel
 
         private void LoadModel(string RefFileName)
         {

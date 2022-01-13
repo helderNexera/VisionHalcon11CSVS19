@@ -107,6 +107,31 @@ namespace VisionHalcon11CSVS19
             TwincatInterface.ClearRequest();
         }
 
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            timer1.Enabled = false;
+            DialogResult result = MessageBox.Show(null, "Are you sur you want to quit ?", "Confirmation request", MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes)
+            {
+                if (Cam.IsConnected)
+                {
+                    Cam.DeconnectionCam();
+                }
+                this.Close();
+            }
+            else
+            {
+                timer1.Enabled = true;
+            }
+        }
+
+        private void btnInit_Click(object sender, EventArgs e)
+        {
+            string RefName = TwincatInterface.getRefFileName();
+            Cam.InitVision(RefName);
+            lbFileRefName.Text = RefName;
+        }
+
         private void timer1_Tick(object sender, EventArgs e)
         {
             if (TwincatInterface.IsConnected())
@@ -121,25 +146,17 @@ namespace VisionHalcon11CSVS19
                 Application.Exit();
             }
         }
-        private void btnExit_Click(object sender, EventArgs e)
+
+        private void timer2_Tick(object sender, EventArgs e)
         {
-            timer1.Enabled = false;
-            DialogResult result = MessageBox.Show(null, "Are you sur you want to quit ?", "Confirmation request", MessageBoxButtons.YesNo);
-            if (result == DialogResult.Yes)
-            {
-                this.Close();
-            }
-            else
-            {
-                timer1.Enabled = true;
-            }
+            DisplayManualMode(cbxCenter.Checked, cbxManualAnalyse.Checked);
         }
 
-        private void btnInit_Click(object sender, EventArgs e)
+        private void DisplayManualMode(bool Zoom, bool Analyse)
         {
-            string RefName = TwincatInterface.getRefFileName();
-            Cam.InitVision(RefName);
-            lbFileRefName.Text = RefName;
+            TTwincatinterface.VISION_PART_DATA Data = new TTwincatinterface.VISION_PART_DATA();
+
+            Cam.DisplayImageManualMode(Zoom, Analyse, ref Data);
         }
 
         private void cbxRealtime_CheckedChanged(object sender, EventArgs e)
@@ -179,18 +196,6 @@ namespace VisionHalcon11CSVS19
                 cbxManualAnalyse.Enabled = cbxRealtime.Checked;
             }
 
-        }
-
-        private void DisplayManualMode(bool Zoom, bool Analyse)
-        {
-            TTwincatinterface.VISION_PART_DATA Data = new TTwincatinterface.VISION_PART_DATA();
-
-            Cam.DisplayImageManualMode(Zoom, Analyse, ref Data);
-        }
-
-        private void timer2_Tick(object sender, EventArgs e)
-        {
-            DisplayManualMode(cbxCenter.Checked, cbxManualAnalyse.Checked);
         }
 
         private void cbxCenter_CheckedChanged(object sender, EventArgs e)
