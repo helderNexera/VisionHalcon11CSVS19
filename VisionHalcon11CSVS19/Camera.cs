@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using HalconDotNet;
 using System.Windows.Forms;
 using System.IO;
+using System.Threading;
 
 namespace VisionHalcon11CSVS19
 {
@@ -112,35 +113,34 @@ namespace VisionHalcon11CSVS19
             Image = null;
             try
             {
+                //Thread.Sleep(2000);
                 Image = Framegrabber.GrabImage();
                 return true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                disp_message(hv_WindowHandle, "Error with Framgrabber\n" + ex.Message, "window", 40, 10, "red", "false");
                 return false;
             }
         }
 
         public void DisplayImage()
         {
-
-            if (hv_WindowHandle.IsInitialized() && IsConnected)
+            if (IsConnected && hv_WindowHandle.IsInitialized() && Image.IsInitialized())
             {
-                //hv_WindowHandle.DispObj(Image);
                 Image.DispObj(hv_WindowHandle);
             }
         }
 
-        public void DoAnalysis(ref TTwincatinterface.VISION_PART_DATA Data)
+        public void DoAnalysis(ref TTwincatinterface.VISION_PART_DATA Data, bool DispayInWindow)
         {
-            HTuple Row, Column, Angle, Score;
+            //HTuple Row, Column, Angle, Score;
             HTuple DeltaX, DeltaY;
-            HTuple SinAngle, CosAngle;
+            //HTuple SinAngle, CosAngle;
             HTuple RefSearchRadius;
             HTuple ModelRadius, ModelThr;
 
-            HObject Circle, ImageReduced, SelectedRegions, RegionUnion, Region1, ConnectedRegion;
+            //HObject Circle, ImageReduced, SelectedRegions, RegionUnion, Region1, ConnectedRegion;
 
             bool PartFound = false;
 
@@ -151,15 +151,18 @@ namespace VisionHalcon11CSVS19
                 ModelThr = TParams.GetModelThreshold();
 
                 hv_WindowHandle.ClearWindow();
+                if (DispayInWindow)
+                {
+                    Image.DispObj(hv_WindowHandle);
+                    hv_WindowHandle.SetColor("cyan");
+                    hv_WindowHandle.DispCircle(CameraHeight / 2, CameraWidth / 2, RefSearchRadius);
+                }
 
-                Image.DispObj(hv_WindowHandle);
-                hv_WindowHandle.SetColor("cyan");
-                hv_WindowHandle.DispCircle(CameraHeight / 2, CameraWidth / 2, RefSearchRadius);
-
-                Image.FindShapeModel(ShapeModel, 0, 360, 0.4, 0, 0.5, "least_squares", 0, 0.7, out Row, out Column, out Angle, out Score);
+                Image.FindShapeModel(ShapeModel, 0, 360, 0.4, 0, 0.5, "least_squares", 0, 0.7, out HTuple Row, out HTuple Column, out HTuple Angle, out HTuple Score);
 
                 DeltaX = (Column - CameraWidth / 2) * PixToMm;
                 DeltaY = (Row - CameraHeight / 2) * PixToMm;
+
                 if ((Angle.TupleLength() > 0))
                 {
                     if (Score > 0.5)
@@ -167,19 +170,22 @@ namespace VisionHalcon11CSVS19
                         PartFound = true;
                         Angle = Angle.TupleDeg();
 
-                        hv_WindowHandle.SetLineWidth(3);
-                        hv_WindowHandle.SetColor("blue");
+                        HOperatorSet.TupleSin((Angle + 90).TupleRad(), out HTuple SinAngle);
+                        HOperatorSet.TupleCos((Angle + 90).TupleRad(), out HTuple CosAngle);
 
-                        HOperatorSet.TupleSin((Angle + 90).TupleRad(), out SinAngle);
-                        HOperatorSet.TupleCos((Angle + 90).TupleRad(), out CosAngle);
-                        hv_WindowHandle.DispLine(Row, Column, Row + 600 * CosAngle, Column + 600 * SinAngle);
+                        if (DispayInWindow)
+                        {
+                            hv_WindowHandle.SetLineWidth(3);
+                            hv_WindowHandle.SetColor("blue");
+                            hv_WindowHandle.DispLine(Row, Column, Row + 600 * CosAngle, Column + 600 * SinAngle);
+                            hv_WindowHandle.SetLineWidth(1);
+                            hv_WindowHandle.SetColor("blue");
+                            hv_WindowHandle.DispCircle(Row, Column, ModelRadius);
+                            disp_message(hv_WindowHandle, ((((("Correction : [" + (DeltaX.TupleString(".2f"))) + "; ") + (DeltaY.TupleString(".2f"))) + "; ") + (Angle.TupleString(".1f"))) + "]", "Windows", 40, 10, "green", "false");
+                            disp_message(hv_WindowHandle, ("Score : " + ((Score * 100).TupleString(".0f"))) + " %", "window", 30, 5, "green", "false");
+                        }
 
-                        hv_WindowHandle.SetLineWidth(1);
-                        hv_WindowHandle.SetColor("blue");
-                        hv_WindowHandle.DispCircle(Row, Column, ModelRadius);
 
-                        disp_message(hv_WindowHandle, ((((("Correction : [" + (DeltaX.TupleString(".2f"))) + "; ") + (DeltaY.TupleString(".2f"))) + "; ") + (Angle.TupleString(".1f"))) + "]", "Windows", 40, 10, "green", "false");
-                        disp_message(hv_WindowHandle, ("Score : " + ((Score * 100).TupleString(".0f"))) + " %", "window", 30, 5, "green", "false");
 
                         Data.VPD_Present = Convert.ToByte(true);
                         Data.VPD_X = DeltaX;
@@ -193,22 +199,29 @@ namespace VisionHalcon11CSVS19
                 {
                     Data.VPD_Valid = Convert.ToByte(false);
                     // no good part found, check if a part is present
-                    HOperatorSet.GenCircle(out Circle, CameraHeight / 2, CameraWidth / 2, RefSearchRadius);
-                    HOperatorSet.ReduceDomain(Image, Circle, out ImageReduced);
-                    HOperatorSet.Threshold(ImageReduced, out Region1, ModelThr, 255);
-                    HOperatorSet.Connection(Region1, out ConnectedRegion);
-                    HOperatorSet.SelectShape(ConnectedRegion, out SelectedRegions, "area", "and", 50000, 1000000);
-                    //HOperatorSet.SelectShape(Image, out SelectedRegions, "area", "and", 50000, 500000);
-                    HOperatorSet.Union1(SelectedRegions, out RegionUnion);
+                    HOperatorSet.GenCircle(out HObject Circle, CameraHeight / 2, CameraWidth / 2, RefSearchRadius);
+                    HOperatorSet.ReduceDomain(Image, Circle, out HObject ImageReduced);
+                    HOperatorSet.Threshold(ImageReduced, out HObject Region1, ModelThr, 255);
+                    HOperatorSet.Connection(Region1, out HObject ConnectedRegion);
+                    HOperatorSet.SelectShape(ConnectedRegion, out HObject SelectedRegions, "area", "and", 20000, 1000000);
+                    HOperatorSet.Union1(SelectedRegions, out HObject RegionUnion);
                     if (RegionUnion.CountObj() > 0)
                     {
+                        // No good part found, check if a part is present
                         Data.VPD_Present = Convert.ToByte(true);
-                        disp_message(hv_WindowHandle, "Bad part found", "window", 40, 10, "red", "false");
+
+                        if (DispayInWindow)
+                        {
+                            disp_message(hv_WindowHandle, "Bad part found", "window", 40, 10, "red", "false");
+                        }
                     }
                     else
                     {
                         // no part
-                        disp_message(hv_WindowHandle, "No part found", "window", 40, 10, "white", "false");
+                        if (DispayInWindow)
+                        {
+                            disp_message(hv_WindowHandle, "No part found", "window", 40, 10, "white", "false");
+                        }
                     }
                 }
             }
@@ -216,6 +229,43 @@ namespace VisionHalcon11CSVS19
             {
                 disp_message(hv_WindowHandle, "Model not loaded or Image not taked", "window", 40, 10, "white", "false");
             }
+        }
+
+        public bool DisplayImageManualMode(bool Zoom, bool Analyse, ref TTwincatinterface.VISION_PART_DATA Data)
+        {
+            Image = null;
+            try
+            {
+                //Image = Framegrabber.GrabImage();
+                TakePicture();
+            }
+            catch (Exception ex)
+            {
+                disp_message(hv_WindowHandle, "Error with Framgrabber\n" + ex.Message, "window", 40, 10, "red", "false");
+                return false;
+            }
+
+            Image.DispObj(hv_WindowHandle);
+
+            if (Zoom)
+            {
+                hv_WindowHandle.SetColor("magenta");
+                hv_WindowHandle.SetPart(Convert.ToInt16((double)CameraHeight * 0.4), Convert.ToInt16((double)CameraWidth * 0.4), Convert.ToInt16((double)CameraHeight * 0.6), Convert.ToInt16((double)CameraWidth * 0.6));
+                hv_WindowHandle.SetDraw("margin");
+                hv_WindowHandle.DispCircle(CameraHeight / 2, CameraWidth / 2, 100);
+                hv_WindowHandle.DispCross(CameraHeight / 2, CameraWidth / 2, 50, 0);
+            }
+            else
+            {
+                hv_WindowHandle.SetPart(0, 0, CameraHeight, CameraWidth);
+            }
+
+            if (Analyse)
+            {
+                DoAnalysis(ref Data, true);
+            }
+
+            return true;
         }
 
         private HFramegrabber Framegrabber;

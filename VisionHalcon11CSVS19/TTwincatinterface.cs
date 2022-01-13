@@ -16,7 +16,7 @@ namespace VisionHalcon11CSVS19
     using TC_UINT       = System.UInt16;
     using TC_DWORD      = System.UInt32;
     using TC_REAL       = System.Single;
-    using TC_LREAL      = System.Double;
+    using TC_LREAL      = System.Double; 
     using TC_ALIGN_8B   = System.Byte;
     using TC_ALIGN_16B  = System.Int16;
     using TC_ALIGN_32B  = System.UInt32;
@@ -64,9 +64,24 @@ namespace VisionHalcon11CSVS19
             this.TCVarAccess.ReleaseMutex();
         }
 
+        public void WriteVisionData(ref VISION_PART_DATA Datas)
+        {
+            this.TCVarAccess.WaitOne();
+            adsClient.WriteAny(hStructVisionData, Datas);
+            this.TCVarAccess.ReleaseMutex();
+        }
+
         public VISION_REQUEST getVisionRequest()
         {
             return VisionData.VI_Request;
+        }
+
+        public void ClearRequest()
+        {
+            this.TCVarAccess.WaitOne();
+            adsClient.WriteAny(hVisionRequest, (short)VISION_REQUEST.VR_None);
+            VisionData.VI_Request = VISION_REQUEST.VR_None;
+            this.TCVarAccess.ReleaseMutex();
         }
 
         public string getRefFileName()
@@ -79,14 +94,6 @@ namespace VisionHalcon11CSVS19
             this.TCVarAccess.WaitOne();
             adsClient.WriteAny(hVisionRequestError, Value);
             VisionData.VI_RequestError = Convert.ToByte(Value);
-            this.TCVarAccess.ReleaseMutex();
-        }
-
-        public void ClearRequest()
-        {
-            this.TCVarAccess.WaitOne();
-            adsClient.WriteAny(hVisionRequest, (short)VISION_REQUEST.VR_None);
-            VisionData.VI_Request = VISION_REQUEST.VR_None;
             this.TCVarAccess.ReleaseMutex();
         }
 
@@ -113,9 +120,9 @@ namespace VisionHalcon11CSVS19
 
         private const string VISION_VAR = "MAIN.sMMI_VisionVar";
 
-        private Mutex TCVarAccess;
-        private TcAdsClient adsClient;
-        private AmsAddress address;
+        private readonly Mutex TCVarAccess;
+        private readonly TcAdsClient adsClient;
+        private readonly AmsAddress address;
         private VISION_DATA VisionData;
 
         private bool AdsConnected;
@@ -138,7 +145,7 @@ namespace VisionHalcon11CSVS19
             VR_GrabImage
         };
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public class VISION_PART_DATA
         {
             public TC_LREAL VPD_X;
@@ -151,7 +158,7 @@ namespace VisionHalcon11CSVS19
             public TC_BOOL VPD_Present;
         };
 
-        [StructLayout(LayoutKind.Sequential, Pack = 0)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         private class VISION_DATA
         {
             public VISION_REQUEST VI_Request;

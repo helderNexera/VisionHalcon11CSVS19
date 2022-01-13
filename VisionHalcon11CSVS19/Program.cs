@@ -17,9 +17,16 @@ namespace VisionHalcon11CSVS19
         static int Main(string[] args)
         {
             Mutex mutex = new Mutex(true, "{DDE97D2C-179F-4A95-B132-B4D3AE3B060D}");
+            String AdsAdress = args.Length >= 1 ? args[0] : "";
 
             if (!mutex.WaitOne(TimeSpan.Zero, true))
             {
+                MessageBox.Show(null, "Application déjà démarrée", "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return -1;
+            }
+            if (String.IsNullOrEmpty(AdsAdress))
+            {
+                MessageBox.Show(null, "Adresse ADS indéfinie", "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return -1;
             }
 
